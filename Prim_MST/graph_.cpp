@@ -27,7 +27,7 @@ edge & graph_::operator()(const char & i, const char & j)
 		if (itr1 == vertices.end())
 			vertices.push_back(b);
 	};
-	const edge res(i, j);
+	edge res(i, j);
 	if (i != j)
 	{
 		auto adjacent_edges = adjacent(i);
@@ -47,6 +47,8 @@ edge & graph_::operator()(const char & i, const char & j)
 			}
 		}
 	}
+	else
+		res.weight = 0;
 	add_vertices(i, j);
 	edges.push_back(res);
 	return *(edges.end() - 1);

@@ -12,7 +12,7 @@ int main()
 	g('f', 'e') = 4;
 	g('d', 'e') = 2;
 	g('d', 'c') = 3;
-	g.print_matrix();
+	g.print_table();
 
 	return 0;
 }
