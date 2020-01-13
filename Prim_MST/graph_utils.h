@@ -13,4 +13,4 @@
 #define HOR   0xC4   /* ? */
 #define CEN   0xC5   /* ? */
 
-void print_table(graph g, bool sort_vertices = true);
+void print_table(const graph &gph, bool sort_vertices = true);

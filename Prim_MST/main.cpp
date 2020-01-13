@@ -21,7 +21,7 @@ int main()
 	std::cout << std::endl;
 	std::cout << std::endl;
 	std::cout << "MST Graph : " << std::endl;
-	const auto mst = g.prim_mst();
+	const auto mst = g.prim_mst('a');
 	print_table(mst);
 	std::cout << std::endl;
 

@@ -6,46 +6,15 @@ class edge
 public:
 	edge(char v1, char v2, int wt = INT_MAX) : vertex1(v1), vertex2(v2), weight(wt) {}
 
-	edge(const edge& e)
-	{
-		this->vertex1 = e.vertex1;
-		this->vertex2 = e.vertex2;
-		this->weight = e.weight;
-	}
-
-	edge& operator=(const edge& e)
-	{
-		this->vertex1 = e.vertex1;
-		this->vertex2 = e.vertex2;
-		this->weight = e.weight;
-		return *this;
-	}
-
-	edge& operator=(const int& w)
-	{
-		this->weight = w;
-		return *this;
-	}
-
-	bool operator==(const edge& e) const
-	{
-		const auto res = this->weight == e.weight;
-		return res;
-	}
-
-	bool operator<(const edge& e) const
-	{
-		return this->weight < e.weight;
-	}
-
-	bool operator>(const edge& e) const
-	{
-		return this->weight > e.weight;
-	}
-
-	bool is_connected() const { return !(weight == INT_MAX); }
+	edge(const edge& e);
+	edge& operator=(const edge& e);
+	edge& operator=(const int& w);
+	bool operator==(const edge& e) const;
+	bool operator<(const edge& e) const;
+	bool operator>(const edge& e) const;
+	bool is_connected() const;
 
 	char	vertex1;
 	char	vertex2;
-	int	weight;
+	int		weight;
 };

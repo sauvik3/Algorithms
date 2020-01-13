@@ -1,4 +1,5 @@
 #include "graph.h"
+#include <algorithm>
 
 edge graph::operator()(const char & i, const char & j) const
 {
@@ -54,7 +55,7 @@ edge & graph::operator()(const char & i, const char & j)
 	return *(edges.end() - 1);
 }
 
-std::vector<std::pair<char, edge>> graph::adjacent(char v) const
+std::vector<std::pair<char, edge>> graph::adjacent(const char &v) const
 {
 	std::vector<std::pair<char, edge>> res;
 	for (auto edge : edges)
@@ -67,7 +68,7 @@ std::vector<std::pair<char, edge>> graph::adjacent(char v) const
 	return res;
 }
 
-void graph::dfs(std::unordered_map<char, bool>& visited, char current_vertex) const
+void graph::dfs(std::unordered_map<char, bool>& visited, const char &current_vertex) const
 {
 	visited[current_vertex] = true;
 	auto adjacent_vertices = adjacent(current_vertex);
@@ -78,7 +79,7 @@ void graph::dfs(std::unordered_map<char, bool>& visited, char current_vertex) co
 	}
 }
 
-bool graph::is_connected()
+bool graph::is_connected() const
 {
 	auto res = true;
 	std::unordered_map<char, bool> visited;
@@ -96,8 +97,33 @@ bool graph::is_connected()
 	return res;
 }
 
-graph graph::prim_mst() const
+graph graph::prim_mst(const char &starting_vertex) const
 {
 	graph res;
+	static auto first_run = true;
+	static std::unordered_map<char, int> dist_table;
+	static std::unordered_map<char, bool> visited;
+	if (first_run) {
+		for (const auto vertex : vertices) {
+			visited.insert(std::make_pair(vertex, false));
+			dist_table[vertex] = operator()(starting_vertex, vertex).weight;
+		}
+		first_run = false;
+	}
+
+	auto adjacent_edges = adjacent(starting_vertex);
+	for (const auto current_edge : adjacent_edges)
+	{
+		auto current_vertex = current_edge.first;
+		const auto current_wt = dist_table[starting_vertex] + current_edge.second.weight;
+		if (!visited[current_vertex] || dist_table[current_vertex] > current_wt)
+		{
+			dist_table[current_vertex] = current_wt;
+			res(current_edge.second.vertex1, current_edge.second.vertex2) = current_edge.second.weight;
+		}
+		prim_mst(current_vertex);
+	}
+	visited[starting_vertex] = true;
+
 	return res;
 }

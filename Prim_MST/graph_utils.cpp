@@ -4,8 +4,9 @@
 #include <iomanip>
 #include <algorithm>
 
-void print_table(graph g, bool sort_vertices)
+void print_table(const graph &gph, bool sort_vertices)
 {
+	graph g(gph);
 	const auto n = g.vertices.size();
 	if (n == 0) {
 		std::cout << "\n" << static_cast<unsigned char>(LUCNR);
