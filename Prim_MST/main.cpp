@@ -1,5 +1,7 @@
 #include "edge.h"
 #include "graph.h"
+#include "graph_utils.h"
+#include <iostream>
 
 int main()
 {
@@ -12,7 +14,16 @@ int main()
 	g('f', 'e') = 4;
 	g('d', 'e') = 2;
 	g('d', 'c') = 3;
-	g.print_table();
+
+	std::cout << std::endl;
+	std::cout << "Original Graph : " << std::endl;
+	print_table(g);
+	std::cout << std::endl;
+	std::cout << std::endl;
+	std::cout << "MST Graph : " << std::endl;
+	const auto mst = g.prim_mst();
+	print_table(mst);
+	std::cout << std::endl;
 
 	return 0;
 }

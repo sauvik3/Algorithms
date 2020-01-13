@@ -29,11 +29,18 @@ public:
 
 	bool operator==(const edge& e) const
 	{
-		const auto res =
-			(this->vertex1 == e.vertex1)
-			&& (this->vertex2 == e.vertex2)
-			&& (this->weight == e.weight);
+		const auto res = this->weight == e.weight;
 		return res;
+	}
+
+	bool operator<(const edge& e) const
+	{
+		return this->weight < e.weight;
+	}
+
+	bool operator>(const edge& e) const
+	{
+		return this->weight > e.weight;
 	}
 
 	bool is_connected() const { return !(weight == INT_MAX); }

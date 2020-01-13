@@ -1,20 +1,18 @@
 #pragma once
-#include "graph_.h"
+#include <vector>
+#include <unordered_map>
+#include "edge.h"
 
-#define INF   "-"   /* ? */
-
-/* Use ASCII Box-Drawing Characters */
-
-#define LLCNR 0xC0   /* ? */
-#define LUCNR 0xDA   /* ? */
-#define RLCNR 0xD9   /* ? */
-#define RUCNR 0xBF   /* ? */
-#define VRT   0xB3   /* ? */
-#define HOR   0xC4   /* ? */
-#define CEN   0xC5   /* ? */
-
-class graph : public graph_
+class graph
 {
 public:
-	void print_table(bool sort_vertices = true);
+	edge operator ()(const char &i, const char &j) const;
+	edge& operator ()(const char &i, const char &j);
+	std::vector<std::pair<char, edge>> adjacent(char v) const;
+	void dfs(std::unordered_map<char, bool> &visited, char current_vertex) const;
+	bool is_connected();
+	graph prim_mst() const;
+
+	std::vector<char>	vertices;
+	std::vector<edge>	edges;
 };

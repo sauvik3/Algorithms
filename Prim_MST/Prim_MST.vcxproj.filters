@@ -18,7 +18,7 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="graph_.cpp">
+    <ClCompile Include="graph_utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="graph.cpp">
@@ -29,7 +29,7 @@
     <ClInclude Include="edge.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="graph_.h">
+    <ClInclude Include="graph_utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="graph.h">

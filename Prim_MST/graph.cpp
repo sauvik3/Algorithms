@@ -1,66 +1,103 @@
 #include "graph.h"
-#include <sstream>
-#include <iostream>
-#include <iomanip>
-#include <algorithm>
 
-void graph::print_table(bool sort_vertices)
+edge graph::operator()(const char & i, const char & j) const
 {
-	const auto n = vertices.size();
-	if (n == 0) {
-		std::cout << "\n" << static_cast<unsigned char>(LUCNR);
-		std::cout << "     ";
-		std::cout << static_cast<unsigned char>(RUCNR);
-		std::cout << "\n" << static_cast<unsigned char>(VRT);
-		std::cout << "Empty";
-		std::cout << static_cast<unsigned char>(VRT) << "\n";
-		std::cout << static_cast<unsigned char>(LLCNR);
-		std::cout << "     ";
-		std::cout << static_cast<unsigned char>(RLCNR);
+	edge res(i, j);
+	if (i != j)
+	{
+		auto adjacent_edges = adjacent(i);
+		for (const auto edge_pair : adjacent_edges) {
+			if (edge_pair.second.vertex2 == j)
+				return edge_pair.second;
+		}
 	}
-	else {
-		if (sort_vertices)
-			std::sort(vertices.begin(), vertices.end());
+	else
+		res.weight = 0;
+	return res;
+}
 
-		size_t w1 = 0;
-		for (const auto i : vertices) {
-			for (const auto j : vertices) {
-				size_t l;
-				std::ostringstream tmpstream;
-				auto this_edge = this->operator()(i, j);
-				if (!this_edge.is_connected())
-					tmpstream << std::right << std::noshowpos << INF << " ";
+edge & graph::operator()(const char & i, const char & j)
+{
+	const auto add_vertices = [this](const char a, const char b)
+	{
+		const auto itr = std::find(vertices.begin(), vertices.end(), a);
+		if (itr == vertices.end())
+			vertices.push_back(a);
+		const auto itr1 = std::find(vertices.begin(), vertices.end(), b);
+		if (itr1 == vertices.end())
+			vertices.push_back(b);
+	};
+	edge res(i, j);
+	if (i != j)
+	{
+		auto adjacent_edges = adjacent(i);
+		for (const auto edge_pair : adjacent_edges) {
+			if (edge_pair.second.vertex2 == j)
+			{
+				const auto itr = std::find(edges.begin(), edges.end(), edge_pair.second);
+				if (itr != edges.end())
+					return *itr;
 				else
-					tmpstream << std::right << std::noshowpos << this_edge.weight << " ";
-				l = tmpstream.str().length();
-				w1 = (w1 > l ? w1 : l);
-			}
-		}
-		const auto w2 = ((w1 + 1)*n);
-
-		std::cout << "\n" << " " << " " << static_cast<unsigned char>(VRT);
-		for (auto k = 0; k < n; ++k) {
-			std::cout << std::right << std::setfill(' ') << std::setw(w1) << vertices[k] << " ";
-		}
-		std::cout << "\n" << static_cast<unsigned char>(HOR) << static_cast<unsigned char>(HOR)
-			<< static_cast<unsigned char>(CEN);
-		for (auto k = 0; k < w2; ++k) {
-			std::cout << static_cast<unsigned char>(HOR);
-		}
-
-		for (const auto i : vertices) {
-			std::cout << "\n";
-			for (const auto j : vertices) {
-				if (j == *vertices.begin()) {
-					std::cout << " " << i << static_cast<unsigned char>(VRT);
+				{
+					const edge new_edge(i, j);
+					edges.push_back(new_edge);
+					add_vertices(i, j);
+					return *(edges.end() - 1);
 				}
-				auto this_edge = this->operator()(i, j);
-				if (!this_edge.is_connected())
-					std::cout << std::right << std::setfill(' ') << std::setw(w1) << INF << " ";
-				else
-					std::cout << std::right << std::setfill(' ')
-					<< std::setw(w1) << this_edge.weight << " ";
 			}
 		}
 	}
+	else
+		res.weight = 0;
+	add_vertices(i, j);
+	edges.push_back(res);
+	return *(edges.end() - 1);
+}
+
+std::vector<std::pair<char, edge>> graph::adjacent(char v) const
+{
+	std::vector<std::pair<char, edge>> res;
+	for (auto edge : edges)
+	{
+		if (edge.vertex1 == v)
+			res.push_back(std::make_pair(edge.vertex2, edge));
+		else if (edge.vertex2 == v)
+			res.push_back(std::make_pair(edge.vertex1, edge));
+	}
+	return res;
+}
+
+void graph::dfs(std::unordered_map<char, bool>& visited, char current_vertex) const
+{
+	visited[current_vertex] = true;
+	auto adjacent_vertices = adjacent(current_vertex);
+	for (const auto vertex : adjacent_vertices)
+	{
+		if (!visited[vertex.first])
+			dfs(visited, vertex.first);
+	}
+}
+
+bool graph::is_connected()
+{
+	auto res = true;
+	std::unordered_map<char, bool> visited;
+	for (const auto vertex : vertices)
+		visited.insert(std::make_pair(vertex, false));
+
+	if (visited.size() > 0)
+		dfs(visited, visited.begin()->first);
+	else
+		res = false;
+
+	for (const auto visit : visited)
+		res = res && visit.second;
+
+	return res;
+}
+
+graph graph::prim_mst() const
+{
+	graph res;
+	return res;
 }

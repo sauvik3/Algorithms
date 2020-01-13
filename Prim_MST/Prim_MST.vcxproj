@@ -146,14 +146,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="graph_utils.cpp" />
     <ClCompile Include="graph.cpp" />
-    <ClCompile Include="graph_.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="edge.h" />
+    <ClInclude Include="graph_utils.h" />
     <ClInclude Include="graph.h" />
-    <ClInclude Include="graph_.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
