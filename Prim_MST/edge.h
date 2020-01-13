@@ -47,5 +47,5 @@ public:
 
 	char	vertex1;
 	char	vertex2;
-	int		weight;
+	int	weight;
 };
