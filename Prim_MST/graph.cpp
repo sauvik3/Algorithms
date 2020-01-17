@@ -1,14 +1,14 @@
 #include "graph.h"
 #include <algorithm>
 
-edge graph::operator()(const char & i, const char & j) const
+edge graph::operator()(const char &v1, const char &v2) const
 {
-	edge res(i, j);
-	if (i != j)
+	edge res(v1, v2);
+	if (v1 != v2)
 	{
-		auto adjacent_edges = adjacent(i);
+		const auto adjacent_edges = adjacent(v1);
 		for (const auto edge_pair : adjacent_edges) {
-			if (edge_pair.second.vertex2 == j)
+			if (edge_pair.first == v2)
 				return edge_pair.second;
 		}
 	}
@@ -17,48 +17,47 @@ edge graph::operator()(const char & i, const char & j) const
 	return res;
 }
 
-edge & graph::operator()(const char & i, const char & j)
+edge& graph::operator()(const char &v1, const char &v2)
 {
-	const auto add_vertices = [this](const char a, const char b)
-	{
-		const auto itr = std::find(vertices.begin(), vertices.end(), a);
-		if (itr == vertices.end())
-			vertices.push_back(a);
-		const auto itr1 = std::find(vertices.begin(), vertices.end(), b);
-		if (itr1 == vertices.end())
-			vertices.push_back(b);
+	const auto add_vertices = [this](const char &a, const char &b) {
+		const auto itr = std::find(vertices_.begin(), vertices_.end(), a);
+		if (itr == vertices_.end())
+			vertices_.push_back(a);
+		const auto itr1 = std::find(vertices_.begin(), vertices_.end(), b);
+		if (itr1 == vertices_.end())
+			vertices_.push_back(b);
 	};
-	edge res(i, j);
-	if (i != j)
+
+	edge res(v1, v2);
+	if (v1 != v2)
 	{
-		auto adjacent_edges = adjacent(i);
+		const auto adjacent_edges = adjacent(v1);
 		for (const auto edge_pair : adjacent_edges) {
-			if (edge_pair.second.vertex2 == j)
-			{
-				const auto itr = std::find(edges.begin(), edges.end(), edge_pair.second);
-				if (itr != edges.end())
-					return *itr;
-				else
-				{
-					const edge new_edge(i, j);
-					edges.push_back(new_edge);
-					add_vertices(i, j);
-					return *(edges.end() - 1);
-				}
-			}
+			if (edge_pair.first == v2 && edge_pair.second.vertex1 == v1)
+				return *std::find(edges_.begin(), edges_.end(), edge_pair.second);
 		}
 	}
 	else
 		res.weight = 0;
-	add_vertices(i, j);
-	edges.push_back(res);
-	return *(edges.end() - 1);
+	add_vertices(v1, v2);
+	edges_.push_back(res);
+	return *(edges_.end() - 1);
+}
+
+std::vector<char> graph::get_vertices() const
+{
+	return vertices_;
+}
+
+std::vector<edge> graph::get_edges() const
+{
+	return edges_;
 }
 
 std::vector<std::pair<char, edge>> graph::adjacent(const char &v) const
 {
 	std::vector<std::pair<char, edge>> res;
-	for (auto edge : edges)
+	for (auto edge : edges_)
 	{
 		if (edge.vertex1 == v)
 			res.push_back(std::make_pair(edge.vertex2, edge));
@@ -68,7 +67,7 @@ std::vector<std::pair<char, edge>> graph::adjacent(const char &v) const
 	return res;
 }
 
-void graph::dfs(std::unordered_map<char, bool>& visited, const char &current_vertex) const
+void graph::dfs(std::unordered_map<char, bool> &visited, const char &current_vertex) const
 {
 	visited[current_vertex] = true;
 	auto adjacent_vertices = adjacent(current_vertex);
@@ -83,7 +82,7 @@ bool graph::is_connected() const
 {
 	auto res = true;
 	std::unordered_map<char, bool> visited;
-	for (const auto vertex : vertices)
+	for (const auto vertex : vertices_)
 		visited.insert(std::make_pair(vertex, false));
 
 	if (visited.size() > 0)
@@ -97,33 +96,59 @@ bool graph::is_connected() const
 	return res;
 }
 
+char graph::min_key() const
+{
+	auto min = INT_MAX;
+	char min_ver = 0;
+	for (const auto vertex : visited_) {
+		const auto wt = dist_table_[vertex.first];
+		if (!vertex.second) {
+			if (wt < min) {
+				min_ver = vertex.first;
+				min = wt;
+			}
+		}
+	}
+	return min_ver;
+}
+
 graph graph::prim_mst(const char &starting_vertex) const
 {
 	graph res;
-	static auto first_run = true;
-	static std::unordered_map<char, int> dist_table;
-	static std::unordered_map<char, bool> visited;
-	if (first_run) {
-		for (const auto vertex : vertices) {
-			visited.insert(std::make_pair(vertex, false));
-			dist_table[vertex] = operator()(starting_vertex, vertex).weight;
-		}
-		first_run = false;
+	for (const auto vertex : vertices_) {
+		visited_.insert(std::make_pair(vertex, false));
+		dist_table_.insert(std::make_pair(vertex, INT_MAX));
 	}
+	dist_table_[starting_vertex] = 0;
 
-	auto adjacent_edges = adjacent(starting_vertex);
-	for (const auto current_edge : adjacent_edges)
+	for (const auto v1 : vertices_)
 	{
-		auto current_vertex = current_edge.first;
-		const auto current_wt = dist_table[starting_vertex] + current_edge.second.weight;
-		if (!visited[current_vertex] || dist_table[current_vertex] > current_wt)
+		auto min_ver = min_key();
+		visited_[min_ver] = true;
+
+		auto adjacent_edges = adjacent(min_ver);
+		for (const auto current_edge : adjacent_edges)
 		{
-			dist_table[current_vertex] = current_wt;
-			res(current_edge.second.vertex1, current_edge.second.vertex2) = current_edge.second.weight;
+			if (current_edge.second.vertex1 == min_ver)
+			{
+				const auto current_vertex = current_edge.first;
+				const auto current_wt = current_edge.second.weight;
+				if (!visited_[current_vertex] || dist_table_[current_vertex] > current_wt)
+				{
+					dist_table_[current_vertex] = current_wt;
+					res(current_edge.second.vertex1, current_edge.second.vertex2) = current_edge.second.weight;
+				}
+			}
 		}
-		prim_mst(current_vertex);
 	}
-	visited[starting_vertex] = true;
+	auto recurse = true;
+	for (const auto visit : visited_) {
+		recurse = recurse && visit.second;
+		if(!recurse)
+			break;
+	}
+	if(recurse)
+		prim_mst(starting_vertex);
 
 	return res;
 }

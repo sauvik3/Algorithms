@@ -7,7 +7,8 @@
 void print_table(const graph &gph, bool sort_vertices)
 {
 	graph g(gph);
-	const auto n = g.vertices.size();
+	auto vertices = g.get_vertices();
+	const auto n = vertices.size();
 	if (n == 0) {
 		std::cout << "\n" << static_cast<unsigned char>(LUCNR);
 		std::cout << "     ";
@@ -21,11 +22,11 @@ void print_table(const graph &gph, bool sort_vertices)
 	}
 	else {
 		if (sort_vertices)
-			std::sort(g.vertices.begin(), g.vertices.end());
+			std::sort(vertices.begin(), vertices.end());
 
 		size_t w1 = 0;
-		for (const auto i : g.vertices) {
-			for (const auto j : g.vertices) {
+		for (const auto i : vertices) {
+			for (const auto j : vertices) {
 				size_t l;
 				std::ostringstream tmpstream;
 				auto this_edge = g(i, j);
@@ -41,7 +42,7 @@ void print_table(const graph &gph, bool sort_vertices)
 
 		std::cout << "\n" << " " << " " << static_cast<unsigned char>(VRT);
 		for (auto k = 0; k < n; ++k) {
-			std::cout << std::right << std::setfill(' ') << std::setw(w1) << g.vertices[k] << " ";
+			std::cout << std::right << std::setfill(' ') << std::setw(w1) << vertices[k] << " ";
 		}
 		std::cout << "\n" << static_cast<unsigned char>(HOR) << static_cast<unsigned char>(HOR)
 			<< static_cast<unsigned char>(CEN);
@@ -49,10 +50,10 @@ void print_table(const graph &gph, bool sort_vertices)
 			std::cout << static_cast<unsigned char>(HOR);
 		}
 
-		for (const auto i : g.vertices) {
+		for (const auto i : vertices) {
 			std::cout << "\n";
-			for (const auto j : g.vertices) {
-				if (j == *g.vertices.begin()) {
+			for (const auto j : vertices) {
+				if (j == *vertices.begin()) {
 					std::cout << " " << i << static_cast<unsigned char>(VRT);
 				}
 				auto this_edge = g(i, j);

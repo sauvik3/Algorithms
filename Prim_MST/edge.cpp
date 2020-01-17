@@ -25,8 +25,7 @@ edge& edge::operator=(const int& w)
 
 bool edge::operator==(const edge& e) const
 {
-	const auto res = this->weight == e.weight;
-	return res;
+	return this->weight == e.weight;
 }
 
 bool edge::operator<(const edge& e) const
